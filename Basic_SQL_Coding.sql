@@ -1,25 +1,3 @@
-Database.sql
-Kdo má přístup
-
-Vlastnosti systému
-Typ
-SQL
-Velikost
-3 kB
-Využití úložiště
-3 kB
-Umístění
-Lekce 2
-Vlastník
-Vojtech Flidr
-Změněno
-Vojtech Flidr: 28. 7. 2021
-Otevřeno
-18:16 mnou
-Vytvořeno
-28. 7. 2021
-Bez popisu
-Čtenáři mohou stahovat
 #Order by - Ukol cislo 1
 SELECT
 	`date` datum,
