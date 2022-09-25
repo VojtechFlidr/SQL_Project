@@ -1,1 +1,0 @@
-# SQL_codes_written_by_me_from_EngetoAcademy
