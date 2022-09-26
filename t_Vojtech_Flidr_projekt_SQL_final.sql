@@ -33,28 +33,120 @@
 
 -- Výstup: Pomozte Vašemu kolegovi s daným úkolem. Výstupem by měla být tabulka na databázi, ze které se požadovaná data dají získat jedním selectem. Tabulku pojmenujte t_{jméno}_{příjmení}_projekt_SQL_final. 
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- UPRAVA TABULEK
+CREATE TABLE life_expectancy_edited AS (
+SELECT *,
+	CASE WHEN country = 'British Virgin Islands' THEN 'Virgin Islands, British'
+		WHEN country = 'Faeroe Islands' THEN 'Faroe Islands'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Micronesia (country)' THEN 'Micronesia, Federated States of'
+		WHEN country = 'Timor' THEN 'Timor-Leste'
+		WHEN country = 'United States Virgin Islands' THEN 'Virgin Islands, U.S.'
+		ELSE country END AS coun
+FROM life_expectancy 
+)
+;
+CREATE TABLE economies_edited AS (
+SELECT *,
+	CASE WHEN country = 'Bahamas, The' THEN 'Bahamas'
+		WHEN country = 'British Virgin Islands' THEN 'Virgin Islands, British'
+		WHEN country = 'Brunei Darussalam' THEN 'Brunei'
+		WHEN country = 'Cabo Verde' THEN 'Cape Verde'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Korea, Dem. Peoples Rep.' THEN 'North Korea'
+		WHEN country = 'Libya' THEN 'Libyan Arab Jamahiriya'
+		WHEN country = 'Macao SAR, China' THEN 'Macao'
+		WHEN country = 'Micronesia, Fed. Sts.' THEN 'Micronesia, Federated States of'
+		WHEN country = 'St. Kitts and Nevis' THEN 'Saint Kitts and Nevis'
+		WHEN country = 'St. Lucia' THEN 'Saint Lucia'
+		WHEN country = 'St. Vincent and the Grenadines' THEN 'Saint Vincent and the Grenadines'
+		WHEN country = 'Virgin Islands (U.S.)' THEN 'Virgin Islands, U.S.'
+		ELSE country END AS coun
+FROM economies 
+)
+;
+CREATE TABLE covid19_tests_edited AS (
+SELECT *,
+	CASE WHEN country = 'Democratic Republic of Congo' THEN 'Congo'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Libya' THEN 'Libyan Arab Jamahiriya'
+		WHEN country = 'Russia' THEN 'Russian Federation'
+		ELSE country END AS coun
+FROM covid19_tests
+)
+;
+CREATE TABLE covid19_basic_differences_edited AS (
+SELECT *,
+	CASE WHEN country = 'Cabo Verde' THEN 'Cape Verde'
+		WHEN country = 'Czechia' THEN 'Czech Republic'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Holy See' THEN 'Holy See (Vatican City State)'
+		WHEN country = 'Korea, South' THEN 'Kiribati'
+		WHEN country = 'Libya' THEN 'Libyan Arab Jamahiriya'
+		WHEN country = 'Micronesia' THEN 'Micronesia, Federated States of'
+		WHEN country = 'Russia' THEN 'Russian Federation'
+		WHEN country = 'Taiwan*' THEN 'Taiwan'
+		WHEN country = 'West Bank and Gaza' THEN 'Wallis and Futuna'
+		ELSE country END AS coun
+FROM covid19_basic_differences
+)
+;
+CREATE TABLE covid19_basic_edited AS (
+SELECT *,
+	CASE WHEN country = 'Cabo Verde' THEN 'Cape Verde'
+		WHEN country = 'Czechia' THEN 'Czech Republic'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Holy See' THEN 'Holy See (Vatican City State)'
+		WHEN country = 'Korea, South' THEN 'Kiribati'
+		WHEN country = 'Libya' THEN 'Libyan Arab Jamahiriya'
+		WHEN country = 'Micronesia' THEN 'Micronesia, Federated States of'
+		WHEN country = 'Russia' THEN 'Russian Federation'
+		WHEN country = 'Taiwan*' THEN 'Taiwan'
+		WHEN country = 'US' THEN 'United States'
+		WHEN country = 'West Bank and Gaza' THEN 'Wallis and Futuna'
+		ELSE country END AS coun
+FROM covid19_basic
+)
+;
+CREATE TABLE religions_edited AS (
+SELECT *,
+	CASE WHEN country = 'British Virgin Islands' THEN 'Virgin Islands, British'
+		WHEN country = 'Faeroe Islands' THEN 'Faroe Islands'
+		WHEN country = 'Federated States of Micronesia' THEN 'Micronesia, Federated States of'
+		WHEN country = 'Fiji' THEN 'Fiji Islands'
+		WHEN country = 'Macau' THEN 'Macao'
+		WHEN country = 'Sint Maarten' THEN 'Saint Martin (French part)'
+		WHEN country = 'St. Kitts and Nevis' THEN 'Saint Kitts and Nevis'
+		WHEN country = 'St. Lucia' THEN 'Saint Lucia'
+		WHEN country = 'St. Vincent and the Grenadines' THEN 'Saint Vincent and the Grenadines'
+		WHEN country = 'U.S. Virgin Islands' THEN 'United States Virgin Islands'
+		ELSE country END AS coun
+FROM religions
+)
+;
 UPDATE weather c
 	SET c.rain = REPLACE(c.rain, ' mm', '')
 	WHERE c.rain LIKE '% mm%';
-
+;
 
 UPDATE weather c
      SET c.temp = REPLACE (c.temp, '°c', '')
      WHERE c.temp LIKE '%°c%';
-    
+;    
     
 UPDATE weather c
      SET c.temp = REPLACE (c.temp, ' ', '')
      WHERE c.temp LIKE '% %';
-    
+;    
  
 ALTER TABLE weather
 MODIFY temp int(11);
-
+;
 ALTER TABLE weather
 MODIFY rain float(11);
-     
+;   
 UPDATE weather c
      SET c.date = REPLACE (c.date, ' 00:00:00.000', '')
      WHERE c.date LIKE '% 00:00:00.000%'
@@ -64,10 +156,10 @@ UPDATE weather c
 ;
 CREATE TABLE dateformat AS 
 SELECT *, DATE_FORMAT(date,'%w') AS dates
-FROM covid19_basic_differences 
+FROM covid19_basic_differences_edited 
 ;
 CREATE TABLE task01_ukol_01_v002 AS 
-SELECT country, date, DATE_FORMAT(date,'%m') AS mesice,
+SELECT coun, date, DATE_FORMAT(date,'%m') AS mesice,
 	CASE WHEN dates = 0 OR dates = 6 THEN 'vikend'
 	ELSE 'pracovni_den'
 	END AS dny
@@ -75,7 +167,7 @@ FROM dateformat
 ORDER BY date desc 
 ;
 CREATE TABLE task01_ukol_02_v002 AS
-SELECT country, date, dny,
+SELECT coun, date, dny,
 	CASE WHEN mesice >= 01 and mesice <= 03 THEN '0'
 	WHEN mesice >= 04 AND mesice <= 07 THEN '1'
 	WHEN mesice >= 08 AND mesice <= 09 THEN '2'
@@ -87,35 +179,14 @@ ORDER BY date
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 CREATE TABLE joinment_01 AS (
-SELECT e.country, e.date, 
-   		round( ( e.confirmed - e2.confirmed ), 2 ) as confirmed_per_day,
-	CASE WHEN e2.country = 'Montenegro' THEN 'chybi data'
-		WHEN e2.country = 'Timor-Leste' THEN 'chybi data'
-		WHEN e2.country = 'Burma' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Cabo Verde' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Congo (Brazzaville)' THEN 'Congo'
-		WHEN e2.country = 'Congo (Kinshasa)' THEN 'Congo'
-		WHEN e2.country = 'Cote d Ivoire' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Czechia' THEN 'Czech Republic'
-		WHEN e2.country = 'Diamond Princess' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Eswatini' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Fiji' THEN 'Fiji Islands'
-		WHEN e2.country = 'Holy See' THEN 'Holy See (Vatican City State)'
-		WHEN e2.country = 'Korea, South' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Kosovo' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Libya' THEN 'Libyan Arab Jamahiriya'
-		WHEN e2.country = 'MS Zaandam' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'Micronesia' THEN 'Micronesia, Federated States of'
-		WHEN e2.country = 'Russia' THEN 'Russian Federation'
-		WHEN e2.country = 'Taiwan*' THEN 'nenachazi se v tabulce'
-		WHEN e2.country = 'US' THEN 'United States'
-		WHEN e2.country = 'West Bank and Gaza' THEN 'nenachazi se v tabulce'
-		ELSE e2.country END AS coun
-FROM covid19_basic e 
-JOIN covid19_basic e2 
- 	ON e.country = e2.country
+SELECT e.coun, e.date, 
+   		round( ( e.confirmed - e2.confirmed ), 2 ) as confirmed_per_day
+FROM covid19_basic_edited e 
+LEFT JOIN covid19_basic_edited e2 
+ 	ON e.coun = e2.coun
 	AND e.date = e2.date - 1
-ORDER BY e.country 
+WHERE e.coun IS NOT NULL
+ORDER BY e.coun
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -133,19 +204,18 @@ FROM countries cc
 WHERE 1=1 
 ),
 joinment AS (
-SELECT ro.country, ro.date, ro.dny, ro.jaro_leto_podzim_zima, hu.confirmed_per_day, hu.coun
+SELECT hu.coun, hu.date, ro.dny, ro.jaro_leto_podzim_zima, hu.confirmed_per_day
 FROM task01_ukol_02_v002 ro
 LEFT JOIN joinment_01 hu
-	ON ro.country = hu.coun
+	ON ro.coun = hu.coun
 	AND ro.date = hu.date
-ORDER BY ro.country, ro.date
 )
-SELECT cc.country, jf.date, jf.dny, jf.jaro_leto_podzim_zima, jf.confirmed_per_day, cc.population_density, cc.population, cc.median_age_2018, cc.life_expectancy
+SELECT jf.coun, jf.date, jf.dny, jf.jaro_leto_podzim_zima, jf.confirmed_per_day, cc.population_density, cc.population, cc.median_age_2018, cc.life_expectancy
 FROM joinment jf
 LEFT JOIN population_table cc
-	ON jf.coun = cc.country
-WHERE jf.confirmed_per_day IS NOT NULL AND cc.population_density IS NOT NULL AND cc.population IS NOT NULL 
-ORDER BY jf.country, jf.date
+	ON cc.country = jf.coun
+WHERE jf.coun IS NOT NULL AND jf.coun != ' '
+ORDER BY jf.coun, jf.date
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -154,156 +224,157 @@ ORDER BY jf.country, jf.date
 -- T2_Ukol_04 - dětská úmrtnost - použijeme jako indikátor kvality zdravotnictví
 create table joinment_03 AS (
 WITH GDP_per_person AS (
-SELECT country, round (GDP/population,2) as gdp_per_person, mortaliy_under5, GDP, population, YEAR, gini,
-	CASE WHEN country = 'Africa Eastern and Southern' THEN 'null'
-		WHEN country = 'Africa Western and Central' THEN 'null'
-		WHEN country = 'Arab World' THEN 'null'
-		WHEN country = 'Caribbean small states' THEN 'null'
-		WHEN country = 'Central Europe and the Baltics' THEN 'null'
-		WHEN country = 'Early-demographic dividend' THEN 'null'
-		WHEN country = 'East Asia & Pacific' THEN 'null'
-		WHEN country = 'East Asia & Pacific (excluding high income)' THEN 'null'
-		WHEN country = 'East Asia & Pacific (IDA & IBRD countries)' THEN 'null'
-		WHEN country = 'Euro area' THEN 'null'
-		WHEN country = 'Europe & Central Asia' THEN 'null'
-		WHEN country = 'Europe & Central Asia (excluding high income)' THEN 'null'
-		WHEN country = 'Europe & Central Asia (IDA & IBRD countries)' THEN 'null'
-		WHEN country = 'European Union' THEN 'null'
-		WHEN country = 'Fragile and conflict affected situations' THEN 'null'
-		WHEN country = 'Heavily indebted poor countries (HIPC)' THEN 'null'
-		WHEN country = 'High income' THEN 'null'
-		WHEN country = 'IBRD only' THEN 'null'
-		WHEN country = 'IDA & IBRD total' THEN 'null'
-		WHEN country = 'IDA blend' THEN 'null'
-		WHEN country = 'IDA only' THEN 'null'
-		WHEN country = 'IDA total' THEN 'null'
-		WHEN country = 'Late-demographic dividend' THEN 'null'
-		WHEN country = 'Latin America & Caribbean' THEN 'null'
-		WHEN country = 'Latin America & Caribbean (excluding high income)' THEN 'null'
-		WHEN country = 'Latin America & the Caribbean (IDA & IBRD countries)' THEN 'null'
-		WHEN country = 'Least developed countries: UN classification' THEN 'null'
-		WHEN country = 'Low & middle income' THEN 'null'
-		WHEN country = 'Low income' THEN 'null'
-		WHEN country = 'Lower middle income' THEN 'null'
-		WHEN country = 'Middle East & North Africa' THEN 'null'
-		WHEN country = 'Middle East & North Africa (excluding high income)' THEN 'null'
-		WHEN country = 'Middle East & North Africa (IDA & IBRD countries)' THEN 'null'
-		WHEN country = 'Middle income' THEN 'null'
-		WHEN country = 'North America' THEN 'null'
-		WHEN country = 'Not classified' THEN 'null'
-		WHEN country = 'OECD members' THEN 'null'
-		WHEN country = 'Other small states' THEN 'null'
-		WHEN country = 'Pacific island small states' THEN 'null'
-		WHEN country = 'Post-demographic dividend' THEN 'null'
-		WHEN country = 'Pre-demographic dividend' THEN 'null'
-		WHEN country = 'Small states' THEN 'null'
-		WHEN country = 'South Asia' THEN 'null'
-		WHEN country = 'South Asia (IDA & IBRD)' THEN 'null'
-		WHEN country = 'Sub-Saharan Africa' THEN 'null'
-		WHEN country = 'Sub-Saharan Africa (excluding high income)' THEN 'null'
-		WHEN country = 'Sub-Saharan Africa (IDA & IBRD countries)' THEN 'null'
-		WHEN country = 'Upper middle income' THEN 'null'
-		WHEN country = 'World' THEN 'null'
-		ELSE country END AS coun
-FROM economies
+SELECT coun, round (GDP/population,2) as gdp_per_person, mortaliy_under5, GDP, population, YEAR, gini
+FROM economies_edited
+WHERE YEAR = '2018'
 ),
-gdp AS (
-SELECT coun, gdp_per_person, mortaliy_under5, gini
-FROM GDP_per_person
-WHERE YEAR = '2018' AND coun != 'null' AND mortaliy_under5 IS NOT NULL AND gdp_per_person IS NOT NULL
-)
-SELECT jm.country, jm.date, ct.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, gd.gdp_per_person, gd.mortaliy_under5, gd.gini
+joinment AS (
+SELECT jm.coun, jm.date, ct.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy
 FROM joinment_02 jm
-LEFT JOIN covid19_tests ct
-	ON jm.country = ct.country
+LEFT JOIN covid19_tests_edited ct
+	ON jm.coun = ct.coun
 	AND jm.date = ct.date
-LEFT JOIN gdp gd
-	ON jm.country = gd.coun
-WHERE ct.tests_performed IS NOT NULL AND ct.tests_performed != 0
+)
+SELECT jm.coun, jm.date, jm.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, gd.gdp_per_person, gd.mortaliy_under5, gd.gini
+FROM joinment jm
+LEFT JOIN GDP_per_person gd
+	ON jm.coun = gd.coun
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 -- T2_Ukol_06 - podíly jednotlivých náboženství - použijeme jako proxy proměnnou pro kulturní specifika. Pro každé náboženství v daném státě bych chtěl procentní podíl jeho příslušníků na celkovém obyvatelstvu
 CREATE TABLE nabozenstvi AS (
 WITH Christianity AS (
-SELECT r.country, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Christianity
-FROM religions r 
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Christianity
+FROM religions_edited r 
 JOIN (
-        SELECT r.country , r.year,  sum(r.population) as total_population_2020
-        FROM religions r 
-        WHERE r.year = '2020' and r.country != 'All Countries'
-        GROUP BY r.country
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
     ) r2
-    ON r.country = r2.country
+    ON r.coun = r2.coun
     AND r.year = r2.year
     AND r.population > 0
 WHERE r.religion = 'Christianity'
 ),
 Islam AS (
-SELECT r.country, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Islam
-FROM religions r 
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Islam
+FROM religions_edited r 
 JOIN (
-        SELECT r.country , r.year,  sum(r.population) as total_population_2020
-        FROM religions r 
-        WHERE r.year = '2020' and r.country != 'All Countries'
-        GROUP BY r.country
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
     ) r2
-    ON r.country = r2.country
+    ON r.coun = r2.coun
     AND r.year = r2.year
     AND r.population > 0
 WHERE r.religion = 'Islam'
 ),
-joinment AS (
-SELECT ch.country, ch.Christianity, isl.Islam
-FROM Christianity ch
-LEFT JOIN Islam isl
-	ON ch.country = isl.country 
-),
 Hinduism AS (
-SELECT r.country, round( r.population / r2.total_population_2020 * 100, 2 ) AS Hinduism
-FROM religions r 
+SELECT r.coun, round( r.population / r2.total_population_2020 * 100, 2 ) AS Hinduism
+FROM religions_edited r 
 JOIN (
-        SELECT r.country , r.year,  sum(r.population) as total_population_2020
-        FROM religions r 
-        WHERE r.year = '2020' and r.country != 'All Countries'
-        GROUP BY r.country
+        SELECT r.coun, r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
     ) r2
-    ON r.country = r2.country
+    ON r.coun = r2.coun
     AND r.year = r2.year
     AND r.population > 0
 WHERE r.religion = 'Hinduism'
 ),
-joinment02 AS (
-SELECT isle.country, isle.Christianity, isle.Islam, che.Hinduism
-FROM Hinduism che
-LEFT JOIN joinment isle
-	ON che.country = isle.country 
-),
 Judaism AS (
-SELECT r.country, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Judaism
-FROM religions r 
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Judaism
+FROM religions_edited r 
 JOIN (
-        SELECT r.country , r.year,  sum(r.population) as total_population_2020
-        FROM religions r 
-        WHERE r.year = '2020' and r.country != 'All Countries'
-        GROUP BY r.country
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
     ) r2
-    ON r.country = r2.country
+    ON r.coun = r2.coun
     AND r.year = r2.year
     AND r.population > 0
 WHERE religion = 'Judaism'
+),
+Buddhism AS (
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Buddhism
+FROM religions_edited r 
+JOIN (
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
+    ) r2
+    ON r.coun = r2.coun
+    AND r.year = r2.year
+    AND r.population > 0
+WHERE religion = 'Buddhism'
+),
+Other_Religions AS (
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Other_Religions
+FROM religions_edited r 
+JOIN (
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
+    ) r2
+    ON r.coun = r2.coun
+    AND r.year = r2.year
+    AND r.population > 0
+WHERE religion = 'Other Religions'
+),
+Folk_Religions AS (
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Folk_Religions
+FROM religions_edited r 
+JOIN (
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
+    ) r2
+    ON r.coun = r2.coun
+    AND r.year = r2.year
+    AND r.population > 0
+WHERE religion = 'Folk Religions'
+),
+Unaffiliated_Religions AS (
+SELECT r.coun, r.religion, round( r.population / r2.total_population_2020 * 100, 2 ) AS Unaffiliated_Religions
+FROM religions_edited r 
+JOIN (
+        SELECT r.coun , r.year,  sum(r.population) as total_population_2020
+        FROM religions_edited r 
+        WHERE r.year = '2020' and r.coun != 'All Countries'
+        GROUP BY r.coun
+    ) r2
+    ON r.coun = r2.coun
+    AND r.year = r2.year
+    AND r.population > 0
+WHERE religion = 'Unaffiliated Religions'
 )
-SELECT r.country, ch.Christianity, che.Islam, cher.Hinduism, chere.Judaism
-FROM religions r 
+SELECT r.coun, ch.Christianity, che.Islam, cher.Hinduism, chere.Judaism, j.Buddhism, jo.Other_Religions, jop.Folk_Religions, jopo.Unaffiliated_Religions
+FROM religions_edited r 
 LEFT JOIN Christianity ch
-	ON r.country = ch.country 
+	ON r.coun = ch.coun
 LEFT JOIN Islam che
-	ON r.country = che.country 
+	ON r.coun = che.coun
 LEFT JOIN Hinduism cher
-	ON r.country = cher.country 
+	ON r.coun = cher.coun
 LEFT JOIN Judaism chere
-	ON r.country = chere.country 
-GROUP BY r.country 
+	ON r.coun = chere.coun
+LEFT JOIN Buddhism j
+	ON r.coun = j.coun
+LEFT JOIN Other_Religions jo
+	ON r.coun = jo.coun
+LEFT JOIN Folk_Religions jop
+	ON r.coun = jop.coun
+LEFT JOIN Unaffiliated_Religions jopo
+	ON r.coun = jopo.coun
+GROUP BY r.coun
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -368,38 +439,40 @@ ORDER BY jm.new_city, we.date
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 CREATE TABLE joinment_04 AS (
-SELECT jm.country, jm.date, jm.tests_performed, jm.confirmed_per_day,dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, jm.gdp_per_person, jm.mortaliy_under5, jm.gini, na.Christianity, na.Islam, na.Hinduism, na.Judaism, ec.prumer_temp, ec.pocet_hodin, ec.max_vitr
+SELECT jm.coun, jm.date, jm.tests_performed, jm.confirmed_per_day,dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, jm.gdp_per_person, jm.mortaliy_under5, jm.gini, ec.prumer_temp, ec.pocet_hodin, ec.max_vitr, na.Christianity, na.Islam, na.Hinduism, na.Judaism, na.Buddhism, na.Other_Religions, na.Unaffiliated_Religions, na.Folk_Religions
 FROM joinment_03 jm
 LEFT JOIN edited_city_countries ec
-	ON jm.country = ec.country
-	AND jm.date = ec.date
+	ON jm.coun = ec.country
+	AND jm.date = ec.date 
 LEFT JOIN nabozenstvi na
-	ON jm.country = na.country
+	ON jm.coun = na.coun
+ORDER BY jm.date
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 -- T2_Ukol_07 - rozdíl mezi očekávanou dobou dožití v roce 1965 a v roce 2015 - státy, ve kterých proběhl rychlý rozvoj mohou reagovat jinak než země, které jsou vyspělé už delší dobu
 CREATE TABLE t_Vojtech_Flidr_projekt_SQL_final AS (
 WITH jedna as (
-SELECT country, year, life_expectancy AS devatenacet_padesat
-FROM life_expectancy 
+SELECT coun, year, life_expectancy AS devatenacet_padesat
+FROM life_expectancy_edited 
 WHERE YEAR = '1950' 
 ),
 dva AS (
-SELECT country, year, life_expectancy AS dva_tisice_patnact
-FROM life_expectancy 
+SELECT coun, year, life_expectancy AS dva_tisice_patnact
+FROM life_expectancy_edited 
 WHERE YEAR = '2015' 
 ),
 final_test AS (
-SELECT je.country, je.devatenacet_padesat, dv.dva_tisice_patnact, (dv.dva_tisice_patnact - je.devatenacet_padesat) AS rozdil_doziti
+SELECT je.coun, je.devatenacet_padesat, dv.dva_tisice_patnact, (dv.dva_tisice_patnact - je.devatenacet_padesat) AS rozdil_doziti
 FROM jedna je
 LEFT JOIN dva dv
-	ON je.country = dv.country
+	ON je.coun = dv.coun
 )
-SELECT jm.country, jm.date, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.tests_performed, jm.confirmed_per_day, jm.gdp_per_person, jm.gini, jm.mortaliy_under5, jm.median_age_2018, jm.Christianity, jm.Islam, jm.Hinduism, jm.Judaism, fi.rozdil_doziti, jm.prumer_temp, jm.pocet_hodin, jm.max_vitr
+SELECT jm.coun, jm.date, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.tests_performed, jm.confirmed_per_day, jm.gdp_per_person, jm.gini, jm.mortaliy_under5, jm.median_age_2018, jm.Christianity, jm.Islam, jm.Hinduism, jm.Judaism, jm.Buddhism, jm.Other_Religions, jm.Unaffiliated_Religions, jm.Folk_Religions, fi.rozdil_doziti, jm.prumer_temp, jm.pocet_hodin, jm.max_vitr
 FROM joinment_04 jm
 LEFT JOIN final_test fi
-	ON jm.country = fi.country
+	ON jm.coun = fi.coun
+WHERE jm.coun != ' ' AND jm.coun IS NOT NULL 
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -410,13 +483,7 @@ UPDATE t_Vojtech_Flidr_projekt_SQL_final c
 
 select *
 from t_Vojtech_Flidr_projekt_SQL_final
-
-
-
-
-
-
-
+ORDER BY coun
 
 
 
