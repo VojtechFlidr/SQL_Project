@@ -83,12 +83,12 @@ SELECT *,
 		WHEN country = 'Czechia' THEN 'Czech Republic'
 		WHEN country = 'Fiji' THEN 'Fiji Islands'
 		WHEN country = 'Holy See' THEN 'Holy See (Vatican City State)'
-		WHEN country = 'Korea, South' THEN 'Kiribati'
+		WHEN country = 'Korea, South' THEN 'South Korea'
 		WHEN country = 'Libya' THEN 'Libyan Arab Jamahiriya'
 		WHEN country = 'Micronesia' THEN 'Micronesia, Federated States of'
 		WHEN country = 'Russia' THEN 'Russian Federation'
 		WHEN country = 'Taiwan*' THEN 'Taiwan'
-		WHEN country = 'West Bank and Gaza' THEN 'Wallis and Futuna'
+		WHEN country = 'US' THEN 'United States'
 		ELSE country END AS coun
 FROM covid19_basic_differences
 )
@@ -154,20 +154,24 @@ UPDATE weather c
 -- T1_Ukol_01 - binární proměnná pro víkend / pracovní den
 -- T1_Ukol_02 - roční období daného dne (zakódujte prosím jako 0 až 3)
 ;
-CREATE TABLE dateformat AS 
-SELECT *, DATE_FORMAT(date,'%w') AS dates
-FROM covid19_basic_differences_edited 
+CREATE TABLE dateformat AS (
+SELECT DISTINCT co.country,DATE_FORMAT(cbd.date,'%w') AS dates, cbd.date
+FROM countries co
+LEFT JOIN covid19_basic_differences_edited cbd
+ON cbd.coun = co.country 
+)
 ;
-CREATE TABLE task01_ukol_01_v002 AS 
-SELECT coun, date, DATE_FORMAT(date,'%m') AS mesice,
+CREATE TABLE task01_ukol_01_v002 AS (
+SELECT country, date, DATE_FORMAT(date,'%m') AS mesice,
 	CASE WHEN dates = 0 OR dates = 6 THEN 'vikend'
 	ELSE 'pracovni_den'
 	END AS dny
 FROM dateformat
-ORDER BY date desc 
+ORDER BY country, date 
+)
 ;
-CREATE TABLE task01_ukol_02_v002 AS
-SELECT coun, date, dny,
+CREATE TABLE task01_ukol_02_v002 AS (
+SELECT country, date, dny,
 	CASE WHEN mesice >= 01 and mesice <= 03 THEN '0'
 	WHEN mesice >= 04 AND mesice <= 07 THEN '1'
 	WHEN mesice >= 08 AND mesice <= 09 THEN '2'
@@ -175,7 +179,8 @@ SELECT coun, date, dny,
 	ELSE 'chyba'
 	END AS jaro_leto_podzim_zima
 FROM task01_ukol_01_v002
-ORDER BY date  
+ORDER BY country, date  
+)
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 CREATE TABLE joinment_01 AS (
@@ -204,18 +209,18 @@ FROM countries cc
 WHERE 1=1 
 ),
 joinment AS (
-SELECT hu.coun, hu.date, ro.dny, ro.jaro_leto_podzim_zima, hu.confirmed_per_day
+SELECT ro.country, hu.date, ro.dny, ro.jaro_leto_podzim_zima, hu.confirmed_per_day
 FROM task01_ukol_02_v002 ro
 LEFT JOIN joinment_01 hu
-	ON ro.coun = hu.coun
+	ON ro.country = hu.coun
 	AND ro.date = hu.date
 )
-SELECT jf.coun, jf.date, jf.dny, jf.jaro_leto_podzim_zima, jf.confirmed_per_day, cc.population_density, cc.population, cc.median_age_2018, cc.life_expectancy
+SELECT jf.country, jf.date, jf.dny, jf.jaro_leto_podzim_zima, jf.confirmed_per_day, cc.population_density, cc.population, cc.median_age_2018, cc.life_expectancy
 FROM joinment jf
 LEFT JOIN population_table cc
-	ON cc.country = jf.coun
-WHERE jf.coun IS NOT NULL AND jf.coun != ' '
-ORDER BY jf.coun, jf.date
+	ON cc.country = jf.country
+WHERE jf.country IS NOT NULL AND jf.country != ' '
+ORDER BY jf.country, jf.date
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -229,16 +234,16 @@ FROM economies_edited
 WHERE YEAR = '2018'
 ),
 joinment AS (
-SELECT jm.coun, jm.date, ct.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy
+SELECT jm.country, jm.date, ct.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy
 FROM joinment_02 jm
 LEFT JOIN covid19_tests_edited ct
-	ON jm.coun = ct.coun
+	ON jm.country = ct.coun
 	AND jm.date = ct.date
 )
-SELECT jm.coun, jm.date, jm.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, gd.gdp_per_person, gd.mortaliy_under5, gd.gini
+SELECT jm.country, jm.date, jm.tests_performed, jm.confirmed_per_day, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, gd.gdp_per_person, gd.mortaliy_under5, gd.gini
 FROM joinment jm
 LEFT JOIN GDP_per_person gd
-	ON jm.coun = gd.coun
+	ON jm.country = gd.coun
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -439,13 +444,13 @@ ORDER BY jm.new_city, we.date
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
 CREATE TABLE joinment_04 AS (
-SELECT jm.coun, jm.date, jm.tests_performed, jm.confirmed_per_day,dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, jm.gdp_per_person, jm.mortaliy_under5, jm.gini, ec.prumer_temp, ec.pocet_hodin, ec.max_vitr, na.Christianity, na.Islam, na.Hinduism, na.Judaism, na.Buddhism, na.Other_Religions, na.Unaffiliated_Religions, na.Folk_Religions
+SELECT jm.country, jm.date, jm.tests_performed, jm.confirmed_per_day,dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.median_age_2018, jm.life_expectancy, jm.gdp_per_person, jm.mortaliy_under5, jm.gini, ec.prumer_temp, ec.pocet_hodin, ec.max_vitr, na.Christianity, na.Islam, na.Hinduism, na.Judaism, na.Buddhism, na.Other_Religions, na.Unaffiliated_Religions, na.Folk_Religions
 FROM joinment_03 jm
 LEFT JOIN edited_city_countries ec
-	ON jm.coun = ec.country
+	ON jm.country = ec.country
 	AND jm.date = ec.date 
 LEFT JOIN nabozenstvi na
-	ON jm.coun = na.coun
+	ON jm.country = na.coun
 ORDER BY jm.date
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
@@ -468,11 +473,11 @@ FROM jedna je
 LEFT JOIN dva dv
 	ON je.coun = dv.coun
 )
-SELECT jm.coun, jm.date, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.tests_performed, jm.confirmed_per_day, jm.gdp_per_person, jm.gini, jm.mortaliy_under5, jm.median_age_2018, jm.Christianity, jm.Islam, jm.Hinduism, jm.Judaism, jm.Buddhism, jm.Other_Religions, jm.Unaffiliated_Religions, jm.Folk_Religions, fi.rozdil_doziti, jm.prumer_temp, jm.pocet_hodin, jm.max_vitr
+SELECT jm.country, jm.date, jm.dny, jm.jaro_leto_podzim_zima, jm.population_density, jm.population, jm.tests_performed, jm.confirmed_per_day, jm.gdp_per_person, jm.gini, jm.mortaliy_under5, jm.median_age_2018, jm.Christianity, jm.Islam, jm.Hinduism, jm.Judaism, jm.Buddhism, jm.Other_Religions, jm.Unaffiliated_Religions, jm.Folk_Religions, fi.rozdil_doziti, jm.prumer_temp, jm.pocet_hodin, jm.max_vitr
 FROM joinment_04 jm
 LEFT JOIN final_test fi
-	ON jm.coun = fi.coun
-WHERE jm.coun != ' ' AND jm.coun IS NOT NULL 
+	ON jm.country = fi.coun
+WHERE jm.country != ' ' AND jm.country IS NOT NULL 
 )
 -- -----------------------------------------------------------------------------------------------------------------------------
 ;
@@ -481,12 +486,6 @@ UPDATE t_Vojtech_Flidr_projekt_SQL_final c
      WHERE c.confirmed_per_day LIKE '%-%'
 
 
-select *
-from t_Vojtech_Flidr_projekt_SQL_final
-ORDER BY coun
-
-
-
-
-
-
+SELECT *
+FROM t_Vojtech_Flidr_projekt_SQL_final
+ORDER BY country 
